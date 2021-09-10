@@ -1,7 +1,7 @@
 {
   "name": "node-red-contrib-godaddy",
-  "version": "3.0.0",
-  "description": "Use GoDaddy API to provides the ability to programmatically manage the full range of GoDaddy products and services / Swagger with Node-Red.",
+  "version": "3.0.1",
+  "description": "Use GoDaddy API to provides the ability to programmatically manage the full range of GoDaddy products and services.",
   "author": "Marcos Caputo",
   "contributors": [
     "Carin Caputo"
