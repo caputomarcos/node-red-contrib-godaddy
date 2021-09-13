@@ -1,6 +1,6 @@
 const Swagger = require('swagger-client')
 
-function sendError (node, config, msg, e) {
+function sendError(node, config, msg, e) {
   let path = config.operationData.path ? config.operationData.path.split("/") : 'godaddy'
   let container = config.container ? config.container : path[path.length - 1]
   // node.error can't save the data we
@@ -8,7 +8,7 @@ function sendError (node, config, msg, e) {
   msg[container] = e.response || e
   if (msg[container].text) delete msg[container].text
   if (msg[container].data) delete msg[container].data
-  if (msg[container].obj) delete msg[container].obj   
+  if (msg[container].obj) delete msg[container].obj
   if (config.errorHandling === 'other output') {
     node.send([null, msg])
   } else if (config.errorHandling === 'throw exception') {
@@ -19,7 +19,7 @@ function sendError (node, config, msg, e) {
 }
 
 module.exports = function (RED) {
-  function GoDaddy (config) {
+  function GoDaddy(config) {
     RED.nodes.createNode(this, config)
     const node = this
 
@@ -28,8 +28,10 @@ module.exports = function (RED) {
       let path = config.operationData.path ? config.operationData.path.split("/") : 'godaddy'
       let container = config.container ? config.container : path[path.length - 1]
       if (msg.openApi && msg.openApi.container) container = msg.openApi.container
-      let openApiUrl = config.openApiUrl 
+      let openApiUrl = config.openApiUrl
       if (msg.openApi && msg.openApi.url) openApiUrl = msg.openApi.url
+      let propagate = config.propagate
+      if (msg.propagate) propagate = msg.propagate
       let parameters = {}
       let requestBody = {} // we need a separate parameter for body in OpenApi 3
 
@@ -48,7 +50,7 @@ module.exports = function (RED) {
             return node.error(`Required input for ${param.name} is missing.`, msg)
           }
           if (param.isActive && param.name !== 'Request body') {
-          // if (param.isActive) {
+            // if (param.isActive) {
             parameters[param.name] = evaluatedInput
           }
           if (param.isActive && param.name === 'Request body') {
@@ -82,7 +84,7 @@ module.exports = function (RED) {
           requestContentType,
           // if available put token for auth
           requestInterceptor: (req) => {
-            if (environment === "Production") req.url = req.url.replace('ote-','')
+            if (environment === "Production") req.url = req.url.replace('ote-', '')
             if (msg.sso_key) req.headers.Authorization = 'sso-key ' + msg.sso_key
             if (msg.headers) {
               req.headers = Object.assign(req.headers || {}, msg.headers)
@@ -93,6 +95,7 @@ module.exports = function (RED) {
           .then((res) => {
             node.status({ fill: "green", shape: "dot", text: `${res.status} ${res.statusText}` })
             msg[container] = res
+            if (propagate === false) delete msg.sso_key
             if (msg[container].text) delete msg[container].text
             if (msg[container].data) delete msg[container].data
             if (msg[container].obj) delete msg[container].obj
@@ -112,7 +115,7 @@ module.exports = function (RED) {
 
   // create API List
   RED.httpAdmin.get('/getNewOpenApiInfo', (request, response) => {
-    const openApiUrl = request.query.openApiUrl 
+    const openApiUrl = request.query.openApiUrl
     if (!openApiUrl) {
       response.send("Missing or invalid openApiUrl parameter 'openApiUrl': " + openApiUrl)
       return

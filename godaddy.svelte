@@ -7,6 +7,7 @@
       container: { value: "", label: "Container" },
       environment: { value: "", label: "Environment" },
       openApiUrl: { value: "", label: "API" },
+      propagate: { value: false },
       api: { value: "", label: "API tag" },
       operation: { value: "", label: "Operation" },
       operationData: { value: {} },
@@ -58,6 +59,7 @@
       if (typeof clone.name === "undefined") clone.name = "";
       if (typeof clone.container === "undefined") clone.container = "";
       if (typeof clone.environment === "undefined") clone.environment = "";
+      if (typeof clone.propagate === "undefined") clone.propagate = false;
       // Workaround if JSON-Editor (ACE) was used -> more info in bottom code (on:change event for typedInput Parameters)
       if (clone.saveTypedInputAgain) {
         clone.saveTypedInputAgain.forEach(({ index, id }) => {
@@ -89,6 +91,8 @@
   let apiList = {};
   let error = "";
   let apis = [];
+  let propagate = false;
+  if (node.propagate) propagate = node.propagate;
   let operations = {};
   let operationDescription = "-";
   let prevOperation;
@@ -127,8 +131,8 @@
       setError(e);
     }
   };
-  if (node.openApiUrl.toString().trim()) createApi()
-  
+  if (node.openApiUrl.toString().trim()) createApi();
+
   // set valid operations if api is set
   $: if (node.api && apiList?.[node.api]) {
     operations = apiList[node.api];
@@ -170,10 +174,7 @@
     }
   }
 
-  const envOptions = [
-    "Operational Test and Evaluation",
-    "Production" 
-  ];
+  const envOptions = ["Operational Test and Evaluation", "Production"];
 
   const swaggerOptions = [
     {
@@ -237,13 +238,18 @@
     {#each swaggerOptions as swaggerOption}
       <option value={swaggerOption.url}>{swaggerOption.label}</option>
     {/each}
-  </Select> 
-  <hr />
-  <Select bind:node prop="errorHandling">
-    {#each errorHandlingOptions as eOption}
-      <option value={eOption}>{eOption}</option>
-    {/each}
   </Select>
+  <div class="form-row">
+    <label style="margin-left: 100px; width: 70%">
+      <input
+        type="checkbox"
+        id="node-input-propagate"
+        style="display:inline-block; width:22px; vertical-align:top;"
+        checked={propagate}
+      />
+      Do you want to propagate API credentials?
+    </label>
+  </div>
   <div class="nodeError">{error}</div>
   <hr />
   <Select bind:node prop="api">
@@ -341,6 +347,12 @@
   {:else}
     <div style="margin-top: 30px; font-weight: bold;">No parameters found!</div>
   {/if}
+  <hr />
+  <Select bind:node prop="errorHandling">
+    {#each errorHandlingOptions as eOption}
+      <option value={eOption}>{eOption}</option>
+    {/each}
+  </Select>
 </div>
 
 <style>
