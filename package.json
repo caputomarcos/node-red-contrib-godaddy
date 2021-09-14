@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-godaddy",
-  "version": "3.0.1",
+  "version": "3.0.3",
   "description": "Use GoDaddy API to provides the ability to programmatically manage the full range of GoDaddy products and services.",
   "author": "Marcos Caputo",
   "contributors": [

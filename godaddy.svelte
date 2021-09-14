@@ -51,6 +51,7 @@
     },
 
     oneditprepare: function () {
+      console.log(this)
       render(this);
     },
     oneditsave: function () {
@@ -60,6 +61,7 @@
       if (typeof clone.container === "undefined") clone.container = "";
       if (typeof clone.environment === "undefined") clone.environment = "";
       if (typeof clone.propagate === "undefined") clone.propagate = false;
+      if (clone.propagate) this._def.color = '#c02626';
       // Workaround if JSON-Editor (ACE) was used -> more info in bottom code (on:change event for typedInput Parameters)
       if (clone.saveTypedInputAgain) {
         clone.saveTypedInputAgain.forEach(({ index, id }) => {

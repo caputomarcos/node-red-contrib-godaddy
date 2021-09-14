@@ -1,6 +1,10 @@
 const Swagger = require('swagger-client')
 
 function sendError(node, config, msg, e) {
+  setTimeout(function() {
+    if (config.environment === "Production") node.status({ fill: "red", shape: "ring", text: "Production" })
+    else node.status({ fill: "green", shape: "ring", text: "OTE" })
+  }, 1000)
   let path = config.operationData.path ? config.operationData.path.split("/") : 'godaddy'
   let container = config.container ? config.container : path[path.length - 1]
   // node.error can't save the data we
@@ -22,6 +26,9 @@ module.exports = function (RED) {
   function GoDaddy(config) {
     RED.nodes.createNode(this, config)
     const node = this
+    
+    if (config.environment === "Production") this.status({ fill: "red", shape: "ring", text: "Production" })
+    else this.status({ fill: "green", shape: "ring", text: "OTE" })
 
     node.on('input', function (msg) {
       let environment = config.environment ? config.environment : 'Operational Test and Evaluation'
@@ -100,15 +107,20 @@ module.exports = function (RED) {
             if (msg[container].data) delete msg[container].data
             if (msg[container].obj) delete msg[container].obj
             node.send(msg)
+            setTimeout(function() {
+              if (config.environment === "Production") node.status({ fill: "red", shape: "ring", text: "Production" })
+              else node.status({ fill: "green", shape: "ring", text: "OTE" })
+            }, 1000)
           }).catch((e) => {
             node.status({ fill: "red", shape: "dot", text: `${e.status} ${e}` })
+            if (propagate === false) delete msg.sso_key
             sendError(node, config, msg, e)
           })
       }).catch(e => {
         node.status({ fill: "blue", shape: "dot", text: "FetchError" })
+        if (propagate === false) delete msg.sso_key
         sendError(node, config, msg, e)
       })
-      node.status({ fill: "", shape: "", text: '' })
     })
   }
   RED.nodes.registerType('godaddy', GoDaddy)
