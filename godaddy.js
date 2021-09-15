@@ -3,7 +3,7 @@ const Swagger = require('swagger-client')
 function sendError(node, config, msg, e) {
   setTimeout(function() {
     if (config.environment === "Production") node.status({ fill: "red", shape: "ring", text: "Production" })
-    else node.status({ fill: "green", shape: "ring", text: "OTE" })
+    else node.status({ fill: "red", shape: "ring", text: "OTE" })
   }, 1000)
   let path = config.operationData.path ? config.operationData.path.split("/") : 'godaddy'
   let container = config.container ? config.container : path[path.length - 1]
@@ -27,7 +27,7 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config)
     const node = this
     
-    if (config.environment === "Production") this.status({ fill: "red", shape: "ring", text: "Production" })
+    if (config.environment === "Production") this.status({ fill: "green", shape: "ring", text: "Production" })
     else this.status({ fill: "green", shape: "ring", text: "OTE" })
 
     node.on('input', function (msg) {
@@ -108,7 +108,7 @@ module.exports = function (RED) {
             if (msg[container].obj) delete msg[container].obj
             node.send(msg)
             setTimeout(function() {
-              if (config.environment === "Production") node.status({ fill: "red", shape: "ring", text: "Production" })
+              if (config.environment === "Production") node.status({ fill: "green", shape: "ring", text: "Production" })
               else node.status({ fill: "green", shape: "ring", text: "OTE" })
             }, 1000)
           }).catch((e) => {
